@@ -47,12 +47,11 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+# Generate messages in the 'msg' folder
+ add_message_files(
+   FILES
+   week0msg.msg
+ )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -105,10 +104,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES week0
-#  CATKIN_DEPENDS roscpp rospy std_msgs
-#  CATKIN_DEPENDS message_runtime
-#  DEPENDS system_lib
+  LIBRARIES week0
+  CATKIN_DEPENDS roscpp rospy std_msgs
+  CATKIN_DEPENDS message_runtime
+  DEPENDS system_lib
 )
 
 ###########
@@ -118,7 +117,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+ include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -208,10 +207,5 @@ include_directories(
 # catkin_add_nosetests(test)
 
 catkin_install_python(PROGRAMS scripts/talker.py scripts/listener.py
-  DESTINATION $ ~/hri2024
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-
- add_message_files(
-   FILES
-   week0msg.msg
- )
