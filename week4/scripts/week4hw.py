@@ -86,7 +86,8 @@ if __name__ == '__main__':
     rospy.init_node('robot_head_control', anonymous=True)
     tfBuffer = tf2_ros.Buffer()
     listener = tf2_ros.TransformListener(tfBuffer)
-    pub = rospy.Publisher('joint_states_input', JointState, queue_size=10)
+    pub = rospy.Publisher('joint_states', JointState, queue_size=10)
+    #Subscriber to joint state gui
     js = JointState()
     rate = rospy.Rate(10.0)
 
@@ -98,4 +99,5 @@ if __name__ == '__main__':
         look_in_direction_hand_pointing()
     except rospy.ROSInterruptException:
         pass
-
+        
+        #Read from one topic and publish to another
