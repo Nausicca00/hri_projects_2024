@@ -3,20 +3,20 @@
 import rospy
 from sensor_msgs.msg import JointState
 
-def callback(data):
-    # Initialize publisher inside the callback to avoid repetitive initialization
-    pub = rospy.Publisher('joint_states', JointState, queue_size=10)
-    # Publish the received data to 'joint_states'
-    pub.publish(data)
-    rospy.loginfo(f"Republished joint state: {data}")
+class SubandPub:
+    def __init__(self):
+        rospy.init_node('repub_joint_states', anonymous=True)
+        self.pub = rospy.Publisher('joint_states', JointState, queue_size=10)
 
-def repub_joint_states():
-    rospy.init_node('repub_joint_states', anonymous=True)
-    rospy.Subscriber('joint_state_input', JointState, callback)
-    rospy.spin()
+    def callback(self, data):
+        # Publish the received data to 'joint_states'
+        self.pub.publish(data)
+        rospy.loginfo(f"Republished joint state: {data}")
+
+    def repub_joint_states(self):
+        rospy.Subscriber('joint_states_input', JointState, self.callback)
+        rospy.spin()
 
 if __name__ == '__main__':
-    try:
-        repub_joint_states()
-    except rospy.ROSInterruptException:
-        pass
+    test = SubandPub()
+    test.repub_joint_states()
