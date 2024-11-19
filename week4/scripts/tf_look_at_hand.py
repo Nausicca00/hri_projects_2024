@@ -49,10 +49,14 @@ class lookAtHand:
                     z = trans.transform.translation.z
                 )
                 
+                
                 pitch = self.js.position[1]
                 pitch += math.atan2(-direction_vector.z, direction_vector.x)
                 yaw = math.atan2(direction_vector.y, direction_vector.x)
-                print(pitch, ' ', yaw)
+                pitch1 = math.degrees(pitch)
+                yaw1 = math.degrees(yaw)
+                print('Pitch before change: ', pitch1, ' and yaw before change: ', yaw1)
+                print('Pitch after change: ', pitch, ' and yaw after change: ', yaw)
                 
                 self.head(pitch, yaw)
             except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
