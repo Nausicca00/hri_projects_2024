@@ -25,7 +25,6 @@ class lookAtHand:
         
     def callback(self, data):
         self.js = data
-        # rospy.loginfo(f"Republished joint state: {data}")
         
     def initialize(self):
         self.js.header.frame_id = "Torso"
@@ -39,7 +38,9 @@ class lookAtHand:
         self.js.position = tuple(pos)
         self.pub.publish(self.js)
         
-    def gestureTowardHand(self):
+    def LookAtHand(self):
+        pitch = 0
+        yaw = 0
         while not rospy.is_shutdown():
             try:
                 trans = self.tfBuffer.lookup_transform('Head', 'l_gripper', rospy.Time())
@@ -49,52 +50,19 @@ class lookAtHand:
                     z = trans.transform.translation.z
                 )
                 
-                
-                pitch = self.js.position[1]
-                pitch += math.atan2(-direction_vector.z, direction_vector.x)
-                yaw = math.atan2(direction_vector.y, direction_vector.x)
-                pitch1 = math.degrees(pitch)
-                yaw1 = math.degrees(yaw)
-                print('Pitch before change: ', pitch1, ' and yaw before change: ', yaw1)
-                print('Pitch after change: ', pitch, ' and yaw after change: ', yaw)
-                
+                pitch -= math.atan2(direction_vector.z, direction_vector.x)
+                yaw += math.atan2(direction_vector.y, direction_vector.x)
                 self.head(pitch, yaw)
+                
             except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                 rospy.logwarn("Failed to get transformation")
                 self.pub.publish(self.js)
             self.rate.sleep()
-        
-        '''
-    def keepHeadPointed(self):
-        while not rospy.is_shutdown():
             
-        
-    def lookAtPointedDirection(self):
-        while not rospy.is_shutdown():
-        '''
-        
-        # Diagram out angles. Print angles before and after I update them. And transform x,y. Angle before and after I add it. Convert to degrees.
-            
-
 if __name__ == '__main__':
     try: 
         look_at_hand = lookAtHand() 
-        look_at_hand.gestureTowardHand()
-        '''
-        look_at_hand.keepHeadPointed()
-        look_at_hand.lookAtPointedDirection()
-        '''
+        look_at_hand.LookAtHand()
+        
     except rospy.ROSInterruptException: 
         pass
-    '''
-    rate = rospy.Rate(10.0)
-    while not rospy.is_shutdown():
-        try:
-            trans = tfBuffer.lookup_transform('Head', 'l_gripper', rospy.Time())
-        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
-            rate.sleep()
-            continue
-
-        print("trans: x: %f y: %f z: %f", trans.transform.translation.x, trans.transform.translation.y, trans.transform.translation.z)
-        rate.sleep()
-    '''
