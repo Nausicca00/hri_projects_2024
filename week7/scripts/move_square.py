@@ -3,6 +3,7 @@ import rospy
 from geometry_msgs.msg import Twist
 import time
 from nav_msgs.msg import Odometry
+import math
 
 class MoveSquare:
     def __init__(self):
@@ -30,7 +31,7 @@ class MoveSquare:
         
             for i in range(4):
                 self.t.linear.x = 1.0
-                self.pub.publish(t)
+                self.pub.publish(self.t)
             
                 self.cur = self.get_odom()
             
@@ -41,7 +42,7 @@ class MoveSquare:
                 self.dist = math.sqrt( self.dx*self.dx + self.dy*self.dy )
                 print(self.dist)
 
-                if self.dist > 1.0:
+                if self.dist > 0.1:
                     self.t.linear.x = 0.0
                     self.pub.publish(self.t)
                     break
