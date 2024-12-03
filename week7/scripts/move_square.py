@@ -4,6 +4,7 @@ from geometry_msgs.msg import Twist
 import time
 from nav_msgs.msg import Odometry
 import math
+from tf.transformations import euler_from_quaternion, quaternion_from_euler
 
 class MoveSquare:
     def __init__(self):
@@ -18,6 +19,12 @@ class MoveSquare:
 
     def get_odom(self):
         return self.odom
+        
+    def get_yaw (self, msg):
+        orientation_q = msg.pose.pose.orientation
+        orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
+        (roll, pitch, yaw) = euler_from_quaternion (orientation_list)
+        return yaw
 
     def move_square(self):
         rospy.init_node('move_square', anonymous=True)
@@ -42,12 +49,25 @@ class MoveSquare:
                 self.dist = math.sqrt( self.dx*self.dx + self.dy*self.dy )
                 print(self.dist)
 
-                if self.dist > 0.1:
+                if self.dist > 0.5:
                     self.t.linear.x = 0.0
                     self.pub.publish(self.t)
-                    break
 
-            # Turn 90 degrees
+                    # Turn 90 degrees
+                    self.current_yaw = self.get_yaw(self.get_odom())
+                    self.target_yaw = self.current_yaw + math.radians(90)
+                    self.target_yaw = (self.target_yaw + math.pi) % (2 * math.pi) - math.pi
+                
+                    if self.current_yaw == self.target_yaw:
+                        self.t.angular.z = 0.0
+                        self.pub.publish(self.t)
+                        self.cur = self.get_odom()
+                        break
+                
+                    self.t.linear.x = 0.0
+                    self.t.angular.z = 0.5
+                    self.pub.publish(self.t)
+                    break
 
 if __name__ == '__main__':
     try:
