@@ -34,7 +34,9 @@ class MoveSquare:
         
         for i in range(4):
             self.start = self.get_odom()
-            
+            #self.current_yaw = self.get_yaw(self.get_odom())
+            #self.target_yaw = self.current_yaw + math.radians(90)
+            #self.turn = self.target_yaw - self.current_yaw
             
             while not rospy.is_shutdown():
                 self.t.linear.x = 1.0
@@ -67,8 +69,12 @@ class MoveSquare:
                         self.t.angular.z = -1.0
                         self.t.linear.x = 0.0
                         self.cur = self.get_odom()
-                    else:
+                    elif self.turn < -1.0:
                         self.t.angular.z = 1.0
+                        self.t.linear.x = 0.0
+                        self.cur = self.get_odom()
+                    else:
+                        self.t.angular.z = 0.0
                         self.t.linear.x = 0.0
                         self.cur = self.get_odom()
                 
