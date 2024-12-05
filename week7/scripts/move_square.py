@@ -29,45 +29,52 @@ class MoveSquare:
     def move_square(self):
         rospy.init_node('move_square', anonymous=True)
         self.rate = rospy.Rate(10)  # 10 Hz
-        self.start = self.get_odom()
-        
         
         self.t = Twist()
         
-        while not rospy.is_shutdown():
-        
-            for i in range(4):
+        for i in range(4):
+            self.start = self.get_odom()
+            
+            
+            while not rospy.is_shutdown():
                 self.t.linear.x = 1.0
-                self.pub.publish(self.t)
+                self.t.angular.z = 0.0
+                #self.pub.publish(self.t)
             
                 self.cur = self.get_odom()
-            
+                
                 self.dx = self.cur.pose.pose.position.x - self.start.pose.pose.position.x
                 self.dy = self.cur.pose.pose.position.y - self.start.pose.pose.position.y
 
                 # distance
-                self.dist = math.sqrt( self.dx*self.dx + self.dy*self.dy )
+                self.dist = math.sqrt(self.dx*self.dx + self.dy*self.dy)
                 print(self.dist)
 
-                if self.dist > 0.5:
+                if self.dist > 1.0:
                     self.t.linear.x = 0.0
-                    self.pub.publish(self.t)
+                    #self.pub.publish(self.t)
 
                     # Turn 90 degrees
                     self.current_yaw = self.get_yaw(self.get_odom())
                     self.target_yaw = self.current_yaw + math.radians(90)
-                    self.target_yaw = (self.target_yaw + math.pi) % (2 * math.pi) - math.pi
-                
-                    if self.current_yaw == self.target_yaw:
-                        self.t.angular.z = 0.0
-                        self.pub.publish(self.t)
+                    self.turn = self.target_yaw - self.current_yaw
+                    print("Difference: ", self.turn, "\n")
+                    self.turn = (self.turn + math.pi) % (2 * math.pi) - math.pi
+                    print("Current:", self.current_yaw, "\n")
+                    print("Target: ", self.target_yaw)
+                    
+                    if self.turn > 1.0:
+                        self.t.angular.z = -1.0
+                        self.t.linear.x = 0.0
                         self.cur = self.get_odom()
-                        break
+                    else:
+                        self.t.angular.z = 1.0
+                        self.t.linear.x = 0.0
+                        self.cur = self.get_odom()
                 
-                    self.t.linear.x = 0.0
-                    self.t.angular.z = 0.5
-                    self.pub.publish(self.t)
-                    break
+                    #self.t.linear.x = 1.0
+                    #self.t.angular.z = 0.0
+                self.pub.publish(self.t)
 
 if __name__ == '__main__':
     try:
