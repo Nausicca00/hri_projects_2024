@@ -25,6 +25,14 @@ class MoveSquare:
         orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
         (roll, pitch, yaw) = euler_from_quaternion (orientation_list)
         return yaw
+        
+    def normalize_angle(self, angle):
+        self.newAngle = angle
+        while self.newAngle <= -180:
+            self.newAngle += 360
+        while self.newAngle > 180:
+            self.newAngle -= 360
+        return self.newAngle
 
     def move_square(self):
         rospy.init_node('move_square', anonymous=True)
@@ -61,7 +69,7 @@ class MoveSquare:
                     self.target_yaw = self.current_yaw + math.radians(90)
                     self.turn = self.target_yaw - self.current_yaw
                     print("Difference: ", self.turn, "\n")
-                    self.turn = (self.turn + math.pi) % (2 * math.pi) - math.pi
+                    self.turn = self.normalize_angle(self.turn)
                     print("Current:", self.current_yaw, "\n")
                     print("Target: ", self.target_yaw)
                     
@@ -81,6 +89,7 @@ class MoveSquare:
                     #self.t.linear.x = 1.0
                     #self.t.angular.z = 0.0
                 self.pub.publish(self.t)
+                self.rate.sleep()
 
 if __name__ == '__main__':
     try:
